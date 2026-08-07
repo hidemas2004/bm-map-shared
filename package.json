@@ -1,0 +1,15 @@
+{
+  "name": "bm-map-datum-check",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "bm-mapシリーズ（bm-map-posting / bm-map-poster）共通の、自治体オープンデータの日本測地系（Tokyo Datum）ズレ検出・補正ロジック",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "test": "node --test src/*.test.ts"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260726.1",
+    "typescript": "^5.9.3"
+  }
+}
