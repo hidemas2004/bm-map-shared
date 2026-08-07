@@ -43,23 +43,29 @@ if (result.verdict === 'correct_all') {
 ```json
 {
   "dependencies": {
-    "bm-map-datum-check": "github:hidemas2004/bm-map-shared#v1.0.0"
+    "bm-map-datum-check": "github:hidemas2004/bm-map-shared#v1.0.1"
   }
 }
 ```
 
-wrangler（esbuild）がTypeScriptソースを直接バンドルするため、このリポジトリ自体はビルド成果物
-（dist/）を持たない。npmレジストリへのpublishも行わない。
+`src/`はTypeScriptソースとして開発用に保持しつつ、消費側には`dist/`配下のコンパイル済みJS（`main`/`types`）
+を配布する。理由: wrangler（esbuild）はTypeScriptソースを直接バンドルできるが、`node scripts/foo.mjs`の
+ような素のNode.js実行はnode_modules配下のTypeScriptファイルの型ストリッピングをサポートしないため
+（`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`）、両方の消費形態（wranglerバンドル / 素のNodeスクリプト）
+に対応するため`dist/`をコミットしている。npmレジストリへのpublishは行わない。
 
 ## 更新の流れ
 
-1. このリポジトリでロジックを修正し、テスト（`npm test`）・型チェック（`npx tsc --noEmit`）を通す。
-2. 新しいタグ（例: `v1.1.0`）を切ってpushする。
-3. 消費側（`bm-map-posting` / `bm-map-poster`）の `package.json` の参照タグを更新し、`npm install` する。
+1. このリポジトリで`src/`のロジックを修正し、テスト（`npm test`）・型チェック（`npx tsc --noEmit`）を通す。
+2. `npm run build` で `dist/` を再生成し、コミットする（**`dist/`の再生成を忘れないこと**。ここを忘れると
+   消費側は古いロジックのまま更新されない）。
+3. `package.json`の`version`を上げ、新しいタグ（例: `v1.0.2`）を切ってpushする。
+4. 消費側（`bm-map-posting` / `bm-map-poster`）の `package.json` の参照タグを更新し、`npm install` する。
 
-## テスト
+## テスト・ビルド
 
 ```
 npm test        # node --test src/*.test.ts
 npx tsc --noEmit
+npm run build    # dist/ を再生成（コミット対象）
 ```
